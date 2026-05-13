@@ -1,0 +1,595 @@
+FLASK + DOCKER + EC2 EXAM COMMANDS
+==================================
+Purpose: Use this file when you need to set up, Dockerize, run, and test a Flask app on AWS EC2.
+Replace placeholders:
+- YOUR_PUBLIC_IP = your EC2 Public IPv4 address
+- YOUR_GITHUB_USERNAME = your GitHub username
+- YOUR_REPO = your GitHub repo name
+
+
+0) WHERE SHOULD I RUN COMMANDS?
+===============================
+On EC2 terminal:
+- install packages
+- clone repo
+- create/edit app files
+- build Docker image
+- run Docker container
+- check docker ps/logs
+
+On your laptop/local terminal:
+- test public IP with curl
+- SSH/scp if needed
+
+
+1) EC2 BASIC SETUP
+==================
+# Update server packages
+sudo apt update && sudo apt upgrade -y
+
+# Install useful tools
+sudo apt install -y git python3 python3-pip curl
+
+# Check server info
+lsb_release -a
+df -h
+free -h
+uptime
+
+
+2) INSTALL DOCKER ON EC2 — QUICK METHOD
+=======================================
+# Install Docker from Ubuntu repository
+sudo apt install -y docker.io
+
+# Start Docker now
+sudo systemctl start docker
+
+# Start Docker automatically on reboot
+sudo systemctl enable docker
+
+# Add ubuntu user to docker group so you can run docker without sudo
+sudo usermod -aG docker ubuntu
+
+# Apply group change in current terminal
+newgrp docker
+
+# Verify Docker
+docker --version
+
+docker run hello-world
+
+
+3) IF DOCKER SAYS PERMISSION DENIED
+===================================
+sudo usermod -aG docker ubuntu
+newgrp docker
+
+# If still not fixed, log out/in or reconnect to EC2.
+
+
+4) GET YOUR FLASK PROJECT ON EC2
+================================
+OPTION A — Clone from GitHub:
+cd ~
+git clone https://github.com/YOUR_GITHUB_USERNAME/YOUR_REPO.git
+cd YOUR_REPO
+ls
+
+OPTION B — Create project manually on EC2:
+mkdir -p ~/flask-api
+cd ~/flask-api
+nano app.py
+nano requirements.txt
+nano Dockerfile
+
+
+5) MINIMUM FLASK APP.PY TEMPLATE
+================================
+# Create app.py quickly using cat:
+cat > app.py <<'EOF'
+from flask import Flask, jsonify, request
+
+app = Flask(__name__)
+
+students = [
+    {'id': 1, 'name': 'Ali', 'grade': 'A'},
+    {'id': 2, 'name': 'Sara', 'grade': 'B'}
+]
+next_id = 3
+
+@app.route('/')
+def home():
+    return 'Flask API is running', 200
+
+@app.route('/api/health')
+def health():
+    return jsonify({'status': 'ok', 'message': 'Flask is running'}), 200
+
+@app.route('/api/students', methods=['GET'])
+def get_students():
+    return jsonify(students), 200
+
+@app.route('/api/students/<int:sid>', methods=['GET'])
+def get_student(sid):
+    student = next((s for s in students if s['id'] == sid), None)
+    if not student:
+        return jsonify({'error': 'Not found'}), 404
+    return jsonify(student), 200
+
+@app.route('/api/students', methods=['POST'])
+def add_student():
+    global next_id
+    data = request.get_json()
+    if not data or 'name' not in data or 'grade' not in data:
+        return jsonify({'error': 'name and grade are required'}), 400
+    new_student = {'id': next_id, 'name': data['name'], 'grade': data['grade']}
+    students.append(new_student)
+    next_id += 1
+    return jsonify(new_student), 201
+
+@app.route('/api/students/<int:sid>', methods=['PUT'])
+def update_student(sid):
+    student = next((s for s in students if s['id'] == sid), None)
+    if not student:
+        return jsonify({'error': 'Not found'}), 404
+    data = request.get_json()
+    student['name'] = data.get('name', student['name'])
+    student['grade'] = data.get('grade', student['grade'])
+    return jsonify(student), 200
+
+@app.route('/api/students/<int:sid>', methods=['DELETE'])
+def delete_student(sid):
+    global students
+    old_len = len(students)
+    students = [s for s in students if s['id'] != sid]
+    if len(students) == old_len:
+        return jsonify({'error': 'Not found'}), 404
+    return jsonify({'message': 'Deleted successfully'}), 200
+
+@app.route('/api/students/count')
+def count_students():
+    return jsonify({'count': len(students)}), 200
+
+@app.route('/api/students/search')
+def search_students():
+    grade = request.args.get('grade')
+    if not grade:
+        return jsonify({'error': 'grade query parameter is required'}), 400
+    results = [s for s in students if s['grade'] == grade]
+    return jsonify(results), 200
+
+if __name__ == '__main__':
+    # host='0.0.0.0' is important on EC2/Docker
+    app.run(host='0.0.0.0', port=5000, debug=False)
+EOF
+
+
+6) REQUIREMENTS.TXT
+===================
+cat > requirements.txt <<'EOF'
+flask
+flask-cors
+pytest
+EOF
+
+
+7) DOCKERFILE
+=============
+cat > Dockerfile <<'EOF'
+FROM python:3.11-slim
+
+WORKDIR /app
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+
+EXPOSE 5000
+
+CMD ["python3", "app.py"]
+EOF
+
+
+8) BUILD DOCKER IMAGE
+=====================
+# Make sure you are inside project folder containing app.py, requirements.txt, Dockerfile
+pwd
+ls
+
+# Build image
+docker build -t flask-api:v1 .
+
+# Check image exists
+docker images
+
+docker images | grep flask-api
+
+
+9) RUN DOCKER CONTAINER
+=======================
+# Normal run command
+docker run -d -p 5000:5000 --restart=always --name flask-api flask-api:v1
+
+# Meaning:
+# -d = run in background
+# -p 5000:5000 = map EC2 port 5000 to container port 5000
+# --restart=always = restart after reboot/crash
+# --name flask-api = container name
+# flask-api:v1 = image name/tag
+
+
+10) IF CONTAINER NAME ALREADY EXISTS
+====================================
+docker stop flask-api
+docker rm flask-api
+docker run -d -p 5000:5000 --restart=always --name flask-api flask-api:v1
+
+
+11) CHECK CONTAINER STATUS AND LOGS
+===================================
+# Show running containers
+docker ps
+
+# Show all containers, including stopped
+docker ps -a
+
+# Show app logs
+docker logs flask-api
+
+# Follow logs live
+docker logs -f flask-api
+
+# Stop container
+docker stop flask-api
+
+# Start stopped container
+docker start flask-api
+
+# Restart container
+docker restart flask-api
+
+# Remove stopped container
+docker rm flask-api
+
+# Open shell inside container
+docker exec -it flask-api bash
+
+
+12) CHECK PORT 5000 ON EC2
+==========================
+# See if port 5000 is listening
+ss -tulnp | grep :5000
+
+# If port is busy, check what is using it
+sudo ss -tulnp | grep :5000
+
+# Check Python processes if you ran Flask without Docker
+ps aux | grep app.py
+
+
+13) TEST FLASK LOCALLY ON EC2
+=============================
+# These run from EC2 terminal
+curl -i http://localhost:5000/api/health
+curl -i http://localhost:5000/api/students
+curl -i http://localhost:5000/api/students/1
+
+# POST new student
+curl -i -X POST http://localhost:5000/api/students \
+  -H 'Content-Type: application/json' \
+  -d '{"name":"Zara","grade":"A"}'
+
+# PUT update student
+curl -i -X PUT http://localhost:5000/api/students/1 \
+  -H 'Content-Type: application/json' \
+  -d '{"grade":"A+"}'
+
+# DELETE student
+curl -i -X DELETE http://localhost:5000/api/students/2
+
+# Count students
+curl -i http://localhost:5000/api/students/count
+
+# Search students
+curl -i 'http://localhost:5000/api/students/search?grade=A'
+
+
+14) TEST FLASK USING EC2 PUBLIC IP
+==================================
+# Run these from your laptop/local terminal OR EC2 terminal
+curl -i http://YOUR_PUBLIC_IP:5000/api/health
+curl -i http://YOUR_PUBLIC_IP:5000/api/students
+
+curl -i -X POST http://YOUR_PUBLIC_IP:5000/api/students \
+  -H 'Content-Type: application/json' \
+  -d '{"name":"Zara","grade":"A"}'
+
+# Browser test:
+# http://YOUR_PUBLIC_IP:5000/api/health
+# http://YOUR_PUBLIC_IP:5000/api/students
+
+
+15) AWS SECURITY GROUP CHECK
+============================
+Your EC2 security group must allow inbound:
+
+SSH:
+Type: SSH
+Port: 22
+Source: Your IP or 0.0.0.0/0 for lab
+
+Flask:
+Type: Custom TCP
+Port: 5000
+Source: 0.0.0.0/0
+
+If port 5000 is not open, localhost may work but public IP will fail.
+
+
+16) GIT COMMANDS YOU MAY NEED
+=============================
+# Configure Git
+git config --global user.name "YOUR_NAME"
+git config --global user.email "YOUR_EMAIL@example.com"
+
+# Check config
+git config --list
+
+# Initialize repo if needed
+git init
+
+# Create .gitignore
+cat > .gitignore <<'EOF'
+__pycache__/
+*.pyc
+.env
+*.log
+venv/
+.DS_Store
+EOF
+
+# Commit files
+git status
+git add .
+git commit -m "Initial commit: Flask Docker API"
+
+# Connect to GitHub remote
+git remote add origin https://github.com/YOUR_GITHUB_USERNAME/YOUR_REPO.git
+git branch -M main
+git push -u origin main
+
+# Clone repo on EC2
+git clone https://github.com/YOUR_GITHUB_USERNAME/YOUR_REPO.git
+
+# Daily update
+git pull
+git add .
+git commit -m "Update Flask API"
+git push
+
+
+17) OPTIONAL: DOCKER COMPOSE FOR FLASK ONLY
+==========================================
+cat > docker-compose.yml <<'EOF'
+version: '3.8'
+services:
+  api:
+    build: .
+    container_name: flask-api
+    ports:
+      - '5000:5000'
+    restart: always
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+EOF
+
+# Start
+docker compose up -d
+
+# Check
+docker compose ps
+
+# Logs
+docker compose logs
+
+docker compose logs -f api
+
+# Stop/remove
+docker compose down
+
+
+18) OPTIONAL: TEST FILE FOR GITHUB ACTIONS / PYTEST
+===================================================
+cat > test_app.py <<'EOF'
+import pytest
+from app import app
+
+@pytest.fixture
+def client():
+    app.config['TESTING'] = True
+    with app.test_client() as client:
+        yield client
+
+def test_health_check(client):
+    response = client.get('/api/health')
+    assert response.status_code == 200
+    data = response.get_json()
+    assert data['status'] == 'ok'
+
+def test_get_students(client):
+    response = client.get('/api/students')
+    assert response.status_code == 200
+    data = response.get_json()
+    assert isinstance(data, list)
+
+def test_get_student_not_found(client):
+    response = client.get('/api/students/9999')
+    assert response.status_code == 404
+
+def test_add_student(client):
+    response = client.post('/api/students', json={'name': 'Memoona', 'grade': 'A'})
+    assert response.status_code == 201
+    data = response.get_json()
+    assert data['name'] == 'Memoona'
+
+def test_add_student_missing_field(client):
+    response = client.post('/api/students', json={'name': 'Sara'})
+    assert response.status_code == 400
+EOF
+
+# Run tests locally
+pip3 install pytest
+python3 -m pytest test_app.py -v
+
+
+19) GITHUB ACTIONS CI.YML
+=========================
+mkdir -p .github/workflows
+
+cat > .github/workflows/ci.yml <<'EOF'
+name: Flask CI Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest
+
+      - name: Run pytest
+        run: python -m pytest test_app.py -v
+
+  build-docker:
+    name: Build Docker Image
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: docker build -t flask-api:${{ github.sha }} .
+
+      - name: Verify container starts correctly
+        run: |
+          docker run -d -p 5000:5000 --name test-container flask-api:${{ github.sha }}
+          sleep 3
+          curl --fail http://localhost:5000/api/health
+          docker stop test-container
+          docker rm test-container
+EOF
+
+# Commit and push workflow
+git add .
+git commit -m "Add CI pipeline with tests and Docker build"
+git push origin main
+
+
+20) DEPLOYMENT REPORT COMMANDS
+==============================
+# Run these and copy output for report
+docker ps
+docker logs flask-api
+ss -tulnp | grep :5000
+df -h
+free -h
+uptime
+curl -i http://YOUR_PUBLIC_IP:5000/api/students
+curl -i http://YOUR_PUBLIC_IP:5000/api/health
+
+# Create deployment_report.md
+cat > deployment_report.md <<'EOF'
+# Deployment Report
+
+## EC2 Information
+- Public IP: YOUR_PUBLIC_IP
+- Instance Type: t2.micro or t3.micro
+- Region: YOUR_REGION
+- OS: Ubuntu
+
+## Docker Version
+Paste output of: docker --version
+
+## Running Container
+Paste output of: docker ps
+
+## Logs
+Paste output of: docker logs flask-api
+
+## Port Check
+Paste output of: ss -tulnp | grep :5000
+
+## Server Resources
+Paste outputs of: df -h, free -h, uptime
+
+## Curl Results
+Paste outputs of:
+curl -i http://YOUR_PUBLIC_IP:5000/api/health
+curl -i http://YOUR_PUBLIC_IP:5000/api/students
+
+## Explanation
+When someone accesses my API, the client sends an HTTP request to the EC2 public IP on port 5000. The AWS Security Group allows inbound traffic on port 5000. Docker maps host port 5000 to container port 5000. Flask receives the request, matches the route, returns JSON, and sends an HTTP status code back.
+EOF
+
+# Commit report
+git add deployment_report.md
+git commit -m "Add deployment report"
+git push
+
+
+21) FINAL EXAM FLOW — COPY THIS IF STUCK
+========================================
+cd ~
+sudo apt update && sudo apt upgrade -y
+sudo apt install -y git python3 python3-pip docker.io
+sudo systemctl start docker
+sudo systemctl enable docker
+sudo usermod -aG docker ubuntu
+newgrp docker
+
+git clone https://github.com/YOUR_GITHUB_USERNAME/YOUR_REPO.git
+cd YOUR_REPO
+
+docker build -t flask-api:v1 .
+docker run -d -p 5000:5000 --restart=always --name flask-api flask-api:v1
+
+docker ps
+docker logs flask-api
+ss -tulnp | grep :5000
+curl -i http://localhost:5000/api/health
+curl -i http://YOUR_PUBLIC_IP:5000/api/health
+curl -i http://YOUR_PUBLIC_IP:5000/api/students
+
+
+22) IMPORTANT REMINDERS
+=======================
+- app.py must use host='0.0.0.0' on EC2/Docker.
+- EC2 security group must allow TCP port 5000.
+- Docker container must show 0.0.0.0:5000->5000/tcp in docker ps.
+- Use curl -i to show status code and headers.
+- If using POST/PUT, include -H 'Content-Type: application/json'.
+- Stop EC2 after exam to avoid charges.
