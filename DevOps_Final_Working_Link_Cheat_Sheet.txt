@@ -1,0 +1,1969 @@
+DEVOPS FINAL CHEAT SHEET
+Rule: Weeks 1–7 have frontend/HTML/CSS/JS details removed. Weeks 8–11 are complete.
+
+PLACEHOLDERS TO REPLACE:
+YOUR_NAME, YOUR_EMAIL, YOUR_GITHUB_USERNAME, YOUR_REPO, YOUR_PUBLIC_IP, YOUR_REGION
+
+====================
+WEEK 1 — LINUX BASICS
+====================
+Concepts: DevOps combines development and operations. SDLC phases: planning, analysis, design, development, testing, deployment, maintenance. Linux is common in DevOps/cloud because it is stable, free, lightweight, and scriptable.
+
+Filesystem: / root, /home user files, /etc config, /var logs/data, /tmp temp, /bin commands, /usr installed apps, /root admin home, /dev devices.
+
+Commands:
+pwd
+ls
+ls -l
+ls -a
+ls -la
+cd /path
+cd folder
+cd ..
+cd ~
+cd -
+mkdir folder
+mkdir -p a/b/c
+touch file.txt
+cp a.txt b.txt
+cp -r folder backup
+mv old.txt new.txt
+rm file.txt
+rm -r folder
+cat file.txt
+less file.txt
+head -10 file.txt
+tail -10 file.txt
+man ls
+ls --help
+
+Project structure task:
+mkdir -p ~/devops/week1/myproject/frontend
+mkdir -p ~/devops/week1/myproject/backend
+mkdir -p ~/devops/week1/myproject/docs
+touch ~/devops/week1/myproject/frontend/index.html
+touch ~/devops/week1/myproject/backend/app.py
+echo 'Week 1 Lab' > ~/devops/week1/myproject/docs/README.txt
+cd ~/devops/week1
+ls -R
+
+Investigation:
+cd /etc
+pwd
+ls | wc -l
+cd /var/log
+ls
+man ls
+cd ~
+
+====================
+WEEK 2 — PERMISSIONS, USERS, PROCESSES
+====================
+Permissions: r=4, w=2, x=1. 755=rwxr-xr-x, 644=rw-r--r--, 600=rw-------, 400=private SSH key.
+chmod u+x script.sh
+chmod 755 run.sh
+chmod 644 public.txt
+chmod 600 private.txt
+chmod 400 key.pem
+
+Users/groups:
+whoami
+id
+groups
+cat /etc/passwd
+cat /etc/group
+sudo adduser sara
+sudo passwd sara
+sudo userdel sara
+sudo userdel -r sara
+sudo groupadd devteam
+sudo usermod -aG devteam $USER
+sudo gpasswd -d $USER devteam
+sudo groupdel devteam
+sudo -i
+exit
+
+Processes/resources:
+ps
+ps aux
+ps aux | grep python
+top
+htop
+kill PID
+kill -9 PID
+killall python3
+pkill -f myapp
+python3 app.py &
+jobs
+fg
+bg
+df -h
+free -h
+nproc
+lscpu
+uptime
+cat /var/log/syslog
+sudo tail -f /var/log/syslog
+dmesg | tail -20
+
+Task:
+mkdir -p ~/devops/week2/secure
+cd ~/devops/week2/secure
+touch public.txt private.txt run.sh
+echo 'YOUR_NAME' > public.txt
+echo 'YOUR_NAME' > private.txt
+echo '#!/bin/bash' > run.sh
+echo 'echo YOUR_NAME' >> run.sh
+chmod 644 public.txt
+chmod 600 private.txt
+chmod 755 run.sh
+ls -l
+./run.sh
+
+sleep 500 &
+sleep 600 &
+sleep 700 &
+ps aux | grep sleep
+kill PID_OF_SLEEP_600
+jobs
+df -h
+free -h
+uptime
+
+====================
+WEEK 3 — BASH SCRIPTING
+====================
+Rules: shebang #!/bin/bash, chmod +x file.sh, run ./file.sh, no spaces around variable assignment, command output uses $(command), arithmetic uses $(( )).
+
+Hello:
+cat > hello.sh <<'EOF'
+#!/bin/bash
+echo "Hello from DevOps"
+EOF
+chmod +x hello.sh
+./hello.sh
+
+Input:
+cat > greet.sh <<'EOF'
+#!/bin/bash
+echo "Enter your name:"
+read name
+echo "Hello $name, today is $(date)"
+EOF
+chmod +x greet.sh
+./greet.sh
+
+Even odd:
+cat > evenodd.sh <<'EOF'
+#!/bin/bash
+echo "Enter a number:"
+read num
+if [ $((num % 2)) -eq 0 ]; then
+  echo "$num is EVEN"
+else
+  echo "$num is ODD"
+fi
+EOF
+chmod +x evenodd.sh
+./evenodd.sh
+
+Operators: -eq, -ne, -gt, -lt, -ge, -le, =, !=
+
+Loops/functions:
+for i in {1..5}; do echo "Count: $i"; done
+counter=1; while [ $counter -le 5 ]; do echo "Iteration: $counter"; counter=$((counter+1)); done
+greet_student() { echo "Hello, $1! Welcome to Week $2 of DevOps."; }
+greet_student "YOUR_NAME" "3"
+
+System info:
+cat > system_info.sh <<'EOF'
+#!/bin/bash
+echo "Report requested by: $1"
+hostname=$(hostname)
+current_user=$(whoami)
+os_info=$(uname -o)
+uptime_info=$(uptime -p)
+disk_usage=$(df -h / | awk 'NR==2 {print $5}')
+mem_free=$(free -h | awk '/^Mem:/ {print $7}')
+echo "Hostname: $hostname"
+echo "User: $current_user"
+echo "OS: $os_info"
+echo "Uptime: $uptime_info"
+echo "Disk Used: $disk_usage"
+echo "Memory Free: $mem_free"
+EOF
+chmod +x system_info.sh
+./system_info.sh YOUR_NAME
+
+Hourglass:
+cat > hourglass.sh <<'EOF'
+#!/bin/bash
+for stars in 7 5 3 1; do for ((i=1;i<=stars;i++)); do echo -n "*"; done; echo; done
+for stars in 3 5 7; do for ((i=1;i<=stars;i++)); do echo -n "*"; done; echo; done
+EOF
+chmod +x hourglass.sh
+./hourglass.sh
+
+====================
+WEEK 4 — FRONTEND OMITTED
+====================
+Frontend details omitted by request. Backend HTTP reminders:
+GET read, POST create, PUT update/replace, PATCH partial update, DELETE remove.
+2xx success, 3xx redirect, 4xx client error, 5xx server error.
+Ports: 22 SSH, 80 HTTP, 443 HTTPS, 5000 Flask, 8080 dev server, 3306 MySQL.
+
+====================
+WEEK 5 — FLASK API + CURL
+====================
+Install:
+mkdir -p ~/devops/week5
+cd ~/devops/week5
+sudo apt install -y python3-pip
+pip3 install flask flask-cors
+
+app.py:
+cat > app.py <<'EOF'
+from flask import Flask, jsonify, request
+from flask_cors import CORS
+app = Flask(__name__)
+CORS(app)
+students = [{'id':1,'name':'Ali','grade':'A'}, {'id':2,'name':'Sara','grade':'B'}]
+next_id = 3
+VALID_GRADES = {'A','B','C','D','F'}
+def find_student(sid): return next((s for s in students if s['id']==sid), None)
+@app.route('/')
+def home(): return 'Flask API is running', 200
+@app.route('/api/health')
+def health(): return jsonify({'status':'ok','message':'Flask is running'}), 200
+@app.route('/api/students', methods=['GET'])
+def get_students(): return jsonify(students), 200
+@app.route('/api/students/<int:sid>', methods=['GET'])
+def get_student(sid):
+    s = find_student(sid)
+    return (jsonify(s),200) if s else (jsonify({'error':'Not found'}),404)
+@app.route('/api/students', methods=['POST'])
+def add_student():
+    global next_id
+    data = request.get_json()
+    if not data or 'name' not in data or 'grade' not in data: return jsonify({'error':'name and grade are required'}),400
+    grade = data['grade'].upper()
+    if grade not in VALID_GRADES: return jsonify({'error':'Invalid grade'}),400
+    new_student = {'id':next_id,'name':data['name'],'grade':grade}
+    students.append(new_student); next_id += 1
+    return jsonify(new_student),201
+@app.route('/api/students/<int:sid>', methods=['PUT'])
+def update_student(sid):
+    s = find_student(sid)
+    if not s: return jsonify({'error':'Not found'}),404
+    data = request.get_json()
+    if not data: return jsonify({'error':'JSON body required'}),400
+    if 'name' in data: s['name'] = data['name']
+    if 'grade' in data:
+        grade = data['grade'].upper()
+        if grade not in VALID_GRADES: return jsonify({'error':'Invalid grade'}),400
+        s['grade'] = grade
+    return jsonify(s),200
+@app.route('/api/students/<int:sid>', methods=['DELETE'])
+def delete_student(sid):
+    global students
+    s = find_student(sid)
+    if not s: return jsonify({'error':'Not found'}),404
+    students = [x for x in students if x['id'] != sid]
+    return jsonify({'message':'Deleted successfully'}),200
+@app.route('/api/students/count')
+def count_students(): return jsonify({'count':len(students)}),200
+@app.route('/api/students/search')
+def search_students():
+    grade = request.args.get('grade'); name = request.args.get('name'); results = students
+    if grade: results = [s for s in results if s['grade'].lower()==grade.lower()]
+    if name: results = [s for s in results if name.lower() in s['name'].lower()]
+    return jsonify(results),200
+if __name__ == '__main__': app.run(host='0.0.0.0', port=5000, debug=False)
+EOF
+python3 app.py
+
+curl -i http://localhost:5000/api/health
+curl -i http://localhost:5000/api/students
+curl -i http://localhost:5000/api/students/1
+curl -i -X POST http://localhost:5000/api/students -H 'Content-Type: application/json' -d '{"name":"Zara","grade":"A"}'
+curl -i -X PUT http://localhost:5000/api/students/1 -H 'Content-Type: application/json' -d '{"grade":"B"}'
+curl -i -X DELETE http://localhost:5000/api/students/2
+curl -i http://localhost:5000/api/students/count
+curl -i 'http://localhost:5000/api/students/search?grade=A'
+
+====================
+WEEK 6 — GIT LOCAL
+====================
+git --version
+sudo apt update && sudo apt install -y git
+git config --global user.name "YOUR_NAME"
+git config --global user.email "YOUR_EMAIL@example.com"
+git config --global core.editor nano
+git config --list
+mkdir -p ~/devops/week6/flask-api
+cd ~/devops/week6/flask-api
+git init
+cat > .gitignore <<'EOF'
+__pycache__/
+*.pyc
+.env
+*.log
+venv/
+.DS_Store
+EOF
+git status
+git add .
+git diff
+git diff --staged
+git commit -m "Initial commit: Flask student CRUD API"
+git log --oneline
+git restore filename
+git restore --staged filename
+git reset --soft HEAD~1
+git reset --hard HEAD~1
+git commit --amend -m "new message"
+git switch -c feature-health-check
+git add app.py
+git commit -m "Add health check endpoint"
+git switch main
+git merge feature-health-check
+git branch -d feature-health-check
+
+====================
+WEEK 7 — GITHUB
+====================
+mkdir my-project
+cd my-project
+git init
+echo "# My Project" > README.md
+git add README.md
+git commit -m "first commit"
+git remote add origin https://github.com/YOUR_GITHUB_USERNAME/my-project.git
+git branch -M main
+git push -u origin main
+git clone https://github.com/YOUR_GITHUB_USERNAME/YOUR_REPO.git
+cd YOUR_REPO
+git pull
+git status
+git add .
+git commit -m "describe what changed"
+git push
+git remote -v
+git fetch
+git switch main
+git pull
+git switch -c feature-api-change
+git add .
+git commit -m "add API change"
+git push origin feature-api-change
+# GitHub: Compare & pull request -> Create PR -> Review -> Merge
+git switch main
+git pull
+git branch -d feature-api-change
+# Conflict fix: edit file, remove <<<<<<< ======= >>>>>>>, git add, git commit.
+
+
+====================
+WEEK 8 — FULL MANUAL EXTRACT
+====================
+
+--- lab 08.pdf page 1 ---
+Department of SWE & CYS                                                                        SE202L Development Operations Lab                                            
+Page 76 of 112 
+  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ WEEK 8  
+Intro to Linux Networking & Application Runtime  
+
+
+--- lab 08.pdf page 2 ---
+Department of SWE & CYS                                                                        SE202L Development Operations Lab                                            
+Page 77 of 112 
+  
+Linux Networking Basics                                                                     .           
+.  
+1.1 IP Addresses and Interfaces  
+Every computer connected to a network has at least one IP address, a unique numerical label that 
+identifies it on the network. Think of it as a postal address: without it,  no one knows where to send 
+data.  
+ 
+Linux systems have network interfaces, named connections to networks. Common interface names 
+are eth0 (wired ethernet), wlan0 (Wi -Fi), and lo (loopback, the machine talking to itself). The 
+loopback address 127.0.0.1 alway s refers to the local machine and is also accessible as localhost.  
+ 
+# View all network interfaces and their IP addresses  
+$ ip addr show  
+ 
+# Shorter, cleaner output  
+$ ip addr show | grep 'inet '  
+ 
+# Older alternative (still widely used)  
+$ ifconfig  
+ 
+In the out put, look for a line like inet 192.168.1.5/24. The number before the / is your IP address. The 
+/24 is the subnet mask, it defines which part of the address identifies the network vs the individual 
+host.  
+ 
+1.2 Testing Connectivity with ping  
+ping sends small test packets to another machine and measures how long the reply takes. It is the 
+first tool you reach for when diagnosing a network problem.  
+# Ping Google's DNS server (tests internet connectivity)  
+$ ping 8.8.8.8  
+ 
+# Ping by hostname (also tests DNS resolut ion)  
+$ ping google.com  
+ 
+# Send only 4 packets then stop  
+$ ping -c 4 google.com  
+ 
+# Ping the loopback, tests the local network stack  
+$ ping 127.0.0.1  
+ 
+If ping 8.8.8.8 works but ping google.com fails, the network is fine but DNS resolution is broken. This 
+distinction immediately narrows down where the problem lies, a critical debugging skill.  
+ 
+1.3 DNS  (Translating Names to IP Addresses)  
+
+--- lab 08.pdf page 3 ---
+Department of SWE & CYS                                                                        SE202L Development Operations Lab                                            
+Page 78 of 112 
+ DNS (Domain Name System) is the phone book of the internet. It translates human -readable names 
+like github.com into machine -readable IP addresses like 140.82.121.4. Without DNS, you would 
+have to memorise IP addresses for every website.  
+# Look up the IP address for a domain name  
+$ nslookup google.com  
+# More detailed DNS query  
+$ dig google.com  
+ 
+# Quick one -line answer  
+$ dig +sh ort google.com  
+1.4 Checking Open Ports and Connections  
+A running application listens on a port, waiting for connections. Knowing which ports are open and 
+which process owns them is essential for server management and debugging.  
+# Show all listening ports a nd the process using them  
+$ ss -tulnp  
+ 
+# Alternative using netstat (older systems)  
+$ netstat -tulnp  
+ 
+# Check if a specific port is in use  
+$ ss -tulnp | grep :5000  
+ 
+# Show all active network connections  
+$ ss -tp 
+ 
+Flag Meaning  
+-t Show TCP connections  
+-u Show UDP connections  
+-l Show only listening (waiting for connections) sockets  
+-n Show numeric port numbers instead of service names  
+-p Show the process name and PID using the socket  
+ 
+1.5 Tracing the Route to a Server  
+Traceroute shows every network hop (r outer) a packet passes through on its way to a destination. It 
+helps diagnose where in the network a connection is slow or failing.  
+$ traceroute google.com  
+ 
+# If traceroute is not installed:  
+$ sudo apt install traceroute -y. 
+Running Applications on Linux S ervers                                                  . 
+2.1 Binding an Application to a Port  
+When you run a server application, like your Flask app, it binds to a port and listens for incoming 
+TCP connections on that port. The application stays running a s long as the process is alive. In 
+
+--- lab 08.pdf page 4 ---
+Department of SWE & CYS                                                                        SE202L Development Operations Lab                                            
+Page 79 of 112 
+ production, applications are expected to keep running permanently, even after the terminal is closed 
+or the developer logs out.  
+ 
+You have already done this with Flask (port 5000) and Python's HTTP server (port 8080). Now let us 
+understand it more carefully.  
+# Start Flask on its default port 5000  
+$ cd ~/devops/week5 && python3 app.py  
+ 
+# In another terminal —> confirm it is listening  
+$ ss -tulnp | grep :5000  
+ 
+# Start Flask on a custom port  
+$ flask run --port=8000  
+ 
+# Bind to all interfaces (0.0.0.0) so other machines on the network can 
+connect  
+$ flask run --host=0.0.0.0 --port=5000  
+ 
+By default, Flask binds to 127.0.0.1 (localhost only). Using --host=0.0.0.0 makes it accessible from 
+other machines. On a cloud server this is req uired so that users outside the machine can reach your 
+app. 
+ 
+2.2 Running Applications in the Background  
+If you start Flask in a terminal and then close that terminal, the application stops. On a real server, 
+applications must keep running indefinitely. Th ere are several ways to achieve this.  
+ 
+Method 1: Using & (simple background job)  
+$ python3 app.py &  
+# [1] 4521   < - Job number and PID  
+ 
+$ jobs         # List background jobs  
+$ fg           # Bring back to foreground  
+$ kill %1      # Kill job number 1  
+ 
+Meth od 2: Using nohup (survives terminal close)  
+# nohup = 'no hang up' — keeps the process running after logout  
+# Output is redirected to nohup.out automatically  
+$ nohup python3 app.py &  
+ 
+# Check it is running  
+$ ps aux | grep app.py  
+ 
+# Redirect output to a spe cific log file  
+$ nohup python3 app.py > app.log 2>&1 &  
+ 
+The 2>&1 part redirects stderr (error output, stream 2) into the same place as stdout (normal output, 
+stream 1). This ensures all output, both normal and error messages, goes into app.log.  
+ 
+
+--- lab 08.pdf page 5 ---
+Department of SWE & CYS                                                                        SE202L Development Operations Lab                                            
+Page 80 of 112 
+ Method 3: Using systemd (production standard)  
+systemd is the Linux service manager. It can start applications automatically at boot, restart them if 
+they crash, and manage their logs. This is how real production services are managed.  
+# Create a service file for your  Flask app  
+$ sudo nano /etc/systemd/system/flaskapp.service  
+ 
+[Unit]  
+Description=Samantha Flask App  
+After=network.target  
+ 
+[Service]  
+User=samantha  
+WorkingDirectory=/home/samantha/devops/week5  
+ExecStart=/usr/bin/python3 app.py  
+Restart=always  
+ 
+[Install]  
+WantedBy=multi -user.target  
+ 
+# Reload systemd, enable and start the service  
+$ sudo systemctl daemon -reload  
+$ sudo systemctl enable flaskapp  
+$ sudo systemctl start flaskapp  
+ 
+# Check its status  
+$ sudo systemctl status flaskapp  
+ 
+# Stop and disable  
+$ sudo systemctl s top flaskapp  
+$ sudo systemctl disable flaskapp  
+ 
+Restart=always in the service file means systemd will automatically restart your app if it crashes. This is 
+the minimum you need for any production service, it ensures your app recovers from unexpected errors  
+without manual intervention.  
+ 
+Logs                                                                                                     . 
+3.1 Why Logs Matter in DevOps  
+Logs are the single most important tool for understanding what is happening on a runnin g server. 
+When an application crashes at 2am, when a user reports that a page is not loading, when a 
+deployment breaks silently, logs are where you find the answer. A DevOps engineer who cannot 
+read logs cannot debug production systems.  
+ 
+Every application writes log messages as it runs. These messages record events: a request was 
+received, a database query ran, an error occurred, a user logged in. By reading the logs, you 
+reconstruct exactly what happened and when.  
+ 
+3.2 System Logs  
+# Main system log —> everything the OS and services record  
+
+--- lab 08.pdf page 6 ---
+Department of SWE & CYS                                                                        SE202L Development Operations Lab                                            
+Page 81 of 112 
+ $ sudo cat /var/log/syslog  
+ 
+# Watch it live as new messages arrive  
+$ sudo tail -f /var/log/syslog  
+ 
+# Authentication log —> login attempts, sudo usage  
+$ sudo cat /var/log/auth.log  
+ 
+# Kernel messages —> hardware, drivers, bo ot 
+$ dmesg | tail -20 
+ 
+# systemd service logs (journalctl)  
+$ sudo journalctl -u flaskapp          # All logs for the flaskapp service  
+$ sudo journalctl -u flaskapp -f       # Follow live logs  
+$ sudo journalctl -u flaskapp --since '10 min ago'  
+ 
+3.3 Applicat ion Logs from Flask  
+Flask prints a log line to the terminal for every HTTP request it receives. When running with nohup or 
+as a systemd service, these logs are written to a file. Here is what a Flask log line looks like and how 
+to read it:  
+ 
+127.0.0.1 - - [05/Apr/2024 14:32:07] "GET /api/students HTTP/1.1" 200 - 
+127.0.0.1 - - [05/Apr/2024 14:32:09] "POST /api/students HTTP/1.1" 201 - 
+127.0.0.1 - - [05/Apr/2024 14:32:11] "GET /api/students/999 HTTP/1.1" 404 - 
+ 
+Part Example  Meaning  
+Client IP  127.0.0.1  IP addr ess of the machine that sent the request  
+Timestamp  [05/Apr/2024 14:32:07]  Date and time the request was received  
+Method + URL  GET /api/students  HTTP method and the endpoint that was called  
+HTTP Version  HTTP/1.1  Protocol version used  
+Status Code  200 / 4 04 Response code, was the request successful?  
+ 
+3.4 Searching and Filtering Logs with grep  
+Production logs can contain thousands of lines. grep filters them down to only the lines that matter.  
+# Show only error lines from syslog  
+$ sudo grep 'error' /var/lo g/syslog  
+ 
+# Case-insensitive search  
+$ sudo grep -i 'error' /var/log/syslog  
+ 
+# Show 3 lines before and after each match (context)  
+$ sudo grep -B 3 -A 3 'ERROR' app.log  
+ 
+# Count how many error lines exist  
+$ sudo grep -c 'error' /var/log/syslog  
+ 
+
+--- lab 08.pdf page 7 ---
+Department of SWE & CYS                                                                        SE202L Development Operations Lab                                            
+Page 82 of 112 
+ # Combine tai l and grep — watch live errors only  
+$ sudo tail -f /var/log/syslog | grep -i 'error'  
+ 
+Networking Utilities Quick Reference                                               . 
+ 
+ 
+4.1 curl for Network Testing  
+You already used curl to test your Flask API in Week 5 . It is also a powerful networking tool for 
+checking if a server is reachable and measuring response times.  
+# Basic connectivity check —> is a server responding?  
+$ curl http://localhost:5000/api/health  
+ 
+# Show HTTP response headers  
+$ curl -I http://localho st:5000  
+ 
+# Measure total response time  
+$ curl -o /dev/null -s -w 'Total time: %{time_total}s \n' http://localhost:5000  
+ 
+# Test connectivity to an external server  
+$ curl -I https://github.com  
+ 
+4.2 wget (Downloading Files)  
+wget downloads files from the intern et directly to your Linux machine from the terminal. It is useful 
+for downloading configuration files, software packages, or test data onto a server.  
+# Download a file to the current directory  
+$ wget https://example.com/file.zip  
+ 
+# Download and save with a  specific filename  
+$ wget -O myfile.zip https://example.com/file.zip  
+ 
+# Download quietly (no progress output)  
+$ wget -q https://example.com/file.txt  
+ 
+4.3 Full Command Reference  
+Command  Purpose  Key Example  
+ip addr show  View IP addresses and interfaces  ip addr show | grep inet  
+ping Test connectivity to a host  ping -c 4 google.com  
+nslookup / dig  DNS lookup, name to IP  dig +short github.com  
+ss -tulnp Show open ports and listening 
+processes  ss -tulnp | grep :5000  
+traceroute  Trace the network path to a 
+desti nation  traceroute google.com  
+curl HTTP requests and connectivity 
+testing  curl -I http://localhost:5000  
+
+--- lab 08.pdf page 8 ---
+Department of SWE & CYS                                                                        SE202L Development Operations Lab                                            
+Page 83 of 112 
+ wget Download files from the internet  wget -O f.txt https://url  
+nohup ... &  Run a process that survives 
+terminal close  nohup python3 app.py &  
+systemc tl Manage systemd services  systemctl status flaskapp  
+journalctl  View systemd service logs  journalctl -u flaskapp -f 
+tail -f Watch a log file in real time  tail -f app.log  
+grep Search and filter log output  grep -i error app.log  
+ 
+Practice Exercise________ _______________________________ .. 
+Part A: Network Investigation  
+1. Find your machine's IP address  
+$ ip addr show | grep 'inet '  
+ 
+2. Test connectivity and DNS  
+$ ping -c 4 8.8.8.8  
+$ ping -c 4 github.com  
+$ dig +short github.com  
+ 
+3. Check what ports are currently open on your machine  
+$ ss -tulnp  
+ 
+Part B: Running Flask in the Background  
+4. Navigate to your Week 5 Flask project  
+$ cd ~/devops/week5  
+ 
+5. Start Flask in the background using nohup and redirect output to a log file  
+$ nohup python3 app.py > flask_app.log 2>&1 &  
+$ echo "Flask PID: $!"  
+ 
+6. Confirm the process is running and the port is open  
+$ ps aux | grep app.py  
+$ ss -tulnp | grep :5000  
+ 
+7. Send a request and watch the log update  
+$ curl http://localhost:5000/api/students  
+$ cat flask_app.log  
+ 
+8. Watch the log live while sending m ore requests  
+# Terminal 1 —> watch the log  
+$ tail -f flask_app.log  
+ 
+# Terminal 2 —> send requests  
+$ curl http://localhost:5000/api/students  
+$ curl http://localhost:5000/api/students/1  
+$ curl http://localhost:5000/api/students/999  
+ 
+
+--- lab 08.pdf page 9 ---
+Department of SWE & CYS                                                                        SE202L Development Operations Lab                                            
+Page 84 of 112 
+ 9. Stop the Flask process  
+$ kill $(ps aux | grep 'python3 app.py' | grep -v grep | awk '{print $2}')  
+ 
+Part C: systemd Service  
+10. Create and enable a systemd service for your Flask app (use the template from Section 2.2)  
+$ sudo nano /etc/systemd/system/flaskapp.service  
+# Fill in your use rname and correct path  
+$ sudo systemctl daemon -reload  
+$ sudo systemctl start flaskapp  
+$ sudo systemctl status flaskapp  
+ 
+11. Test that it survives, stop it, then check it restarts  
+$ sudo systemctl stop flaskapp  
+$ sudo systemctl start flaskapp  
+$ sudo journalctl -u flaskapp --since '2 min ago'  
+ 
+Lab Evaluation Tasks                                                                                 . 
+Complete both tasks. The instructor will verify your running service, open ports, and log output 
+directly in the termina l. Each task carries equal marks.  
+ 
+Lab Task 1: Deploy Flask as a Background Service  
+Deploy your Week 5 Flask CRUD API as a persistent background service using nohup. The app 
+must be running and reachable when the instructor checks — even if the original te rminal was 
+closed.  
+1. Navigate to your Week 5 Flask project directory  
+2. Start the Flask app in the background using nohup, redirecting all output to 
+~/devops/week8/flask_production.log  
+3. Verify the process is running: ps aux | grep app.py — note the PID  
+4. Verify port 5000 is listening: ss -tulnp | grep :5000  
+5. Send three curl requests to your API: GET /api/students, POST a new student, GET 
+/api/health  
+6. Show the instructor flask_production.log — it must contain log lines for all three requests, 
+includi ng timestamps and status codes  
+7. Use grep to filter only the lines with status code 404 from the log: grep '404' 
+flask_production.log  
+8. Demonstrate stopping and restarting the service using kill and nohup  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+====================
+WEEK 9 — FULL MANUAL EXTRACT
+====================
+
+--- week09devops.pdf page 1 ---
+Department of SWE & CYS                                                                       SE202L Development Operations Lab                              
+Page 86 of 112 
+  
+What is Containerisation?                                                                 . 
+1.1 The Problem Containers Solve  
+You have heard the phrase 'it works on my machine'. This is one of the oldest and most frustrating 
+problems in software development. Let suppose, Samantha writes a Flask app on her laptop running 
+Ubuntu 22. It works perfectly. She sends it to a teammate whose machine runs a different Python 
+version and different library versions. The app crashes immediately.  
+ 
+The traditional solut ion was a Virtual Machine (VM),  a complete simulated computer running inside 
+your computer, with its own OS, libraries, and application. VMs solve the consistency problem but 
+are heavy: each VM needs gigabytes of disk space and minutes to start, because it runs a full 
+operating system.  
+ 
+Containers are a lighter alternative. A container packages your application together wi th everything it 
+needs to run  the correct Python version, the exact library ver sions, the configuration files  into a single 
+portable unit. Unlike a VM, a container does not include a full OS. It shares the host machine's OS 
+kernel, making it start in seconds and use far less disk space.  
+1.2 Containers vs Virtual Machines Feature  Virtual Machine  Container  Includes OS  Yes — full OS per VM (GBs) No — shares host kernel (MBs) Startup time Minutes  Seconds  Isolation  Full hardware-level isolation  Process-level isolation  Portability  Large, harder to move  Small, runs anywhere Docker is installed  Use case  Running different OSes, legacy systems  Microservices, modern app deployment  
+ 
+1.3 Key Docker Concepts Concept What It Is  Image  A read-only blueprint for a container — like a class in OOP. Built from a Dockerfile  Container  A running instance of an image — like an object created from a class  Dockerfile  A text file with step-by-step instructions for building a Docker image Docker Hub  A public registry where Docker images are stored and shared (like GitHub but for images) Docker Compose  A tool for defining and running multi-container applications using a single YAML file  Volume  A way to persist data outside the container so it survives container restarts  
+
+--- week09devops.pdf page 2 ---
+Department of SWE & CYS                                                                       SE202L Development Operations Lab                              
+Page 87 of 112 
+ Port mapping Connecting a port on the host machine to a port inside the container  
+ 
+Installing Docker                                                                                . 
+2.1 Installation on Ubuntu 
+# Step 1 Update package list  
+$ sudo apt update  
+ 
+# Step 2 Install prerequisite packages  
+$ sudo apt install -y ca-certificates curl gnupg  
+ 
+# Step 3 Add Docker's official GPG key  
+$ sudo install -m 0755 -d /etc/apt/keyrings  
+$ curl -fsSL https://download.docker.com/linux/ubuntu/gpg | \  
+  sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg  
+ 
+# Step 4 Add Docker repository  
+$ echo "deb [arch=$(dpkg --print-architecture) signed-
+by=/etc/apt/keyrings/docker.gpg] \  
+  https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo 
+$VERSION_CODENAME) stable" | \  
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null  
+ 
+# Step 5 Install Docker  
+$ sudo apt update && sudo apt install -y docker-ce docker-ce-cli containerd.io 
+docker-compose-plugin  
+ 
+# Step 6 Allow your user to run Docker without sudo  
+$ sudo usermod -aG docker $USER  
+$ newgrp docker  
+ 
+# Step 7 Verify installation  
+$ docker --version  
+$ docker run hello-world  
+ 
+After running usermod -aG docker $USER, you may need to log out and log back in for the group 
+change to take effect. The newgrp docker command applies it immediately for the current session.  
+ 
+Docker Images and Containers                                                        . 
+3.1 Working with Images 
+Docker images are downloaded from Docker Hub, the public registry with hundreds of thousands of 
+ready-made images. You can use these official images as a base for your own or run them directly.  
+# Search for an image on Docker Hub  
+$ docker search python  
+ 
+# Download (pull) an image without running it  
+$ docker pull python:3.11-slim  
+ 
+# List all images stored on your machine  
+
+--- week09devops.pdf page 3 ---
+Department of SWE & CYS                                                                       SE202L Development Operations Lab                              
+Page 88 of 112 
+ $ docker images  
+ 
+# Remove an image  
+$ docker rmi python:3.11-slim  
+ 
+The :3.11-slim after the image name is the tag, it specifies the exact version. slim means a minimal 
+image with fewer pre-installed packages. Always pin a specific version tag in production (never use 
+:latest) so your builds are reproducible.  
+ 
+3.2 Running Containers 
+# Run a container interactively (opens a shell inside it)  
+$ docker run -it ubuntu bash  
+ 
+# Run in detached mode (background) with a name  
+$ docker run -d --name my-server nginx  
+ 
+# Run with port mapping: host_port:container_port  
+$ docker run -d -p 8080:80 --name web nginx  
+ 
+# Run with an environment variable  
+$ docker run -d -e MY_VAR=hello nginx  
+ 
+# Open a shell inside a RUNNING container  
+$ docker exec -it my-server bash  
+ 
+3.3 Managing the Container Lifecycle 
+# List running containers  
+$ docker ps  
+ 
+# List ALL containers (including stopped ones)  
+$ docker ps -a  
+ 
+# Stop a running container (graceful)  
+$ docker stop my-server  
+ 
+# Start a stopped container  
+$ docker start my-server  
+ 
+# Remove a stopped container  
+$ docker rm my-server  
+ 
+# Force remove a running container  
+$ docker rm -f my-server  
+ 
+# View logs from a container  
+$ docker logs my-server  
+ 
+# Follow logs live  
+ 
+ 
+
+--- week09devops.pdf page 4 ---
+Department of SWE & CYS                                                                       SE202L Development Operations Lab                              
+Page 89 of 112 
+ $ docker logs -f my-server  
+ Command  What It Does  docker run  Create and start a new container from an image  docker ps List currently running containers  docker ps -a List all containers including stopped ones  docker stop Gracefully stop a running container  docker start  Start a previously stopped container  docker rm  Delete a stopped container  docker logs -f Stream live logs from a container  docker exec -it  Open an interactive shell inside a running container  
+ 
+Writing a Dockerfile                                                                             . 
+4.1 What is a Dockerfile? 
+A Dockerfile is a plain text file that contains step-by-step instructions for building a Docker image. 
+Each instruction creates a new layer in the image. Docker caches each layer, so if you change only 
+your app code, Docker only rebuilds the layers that changed making subsequent builds very fast.  
+ 
+4.2 Dockerfile for the Flask CRUD API 
+Create a Dockerfile inside your Week 5 Flask project directory:  
+ 
+# Dockerfile  
+ 
+# Step 1: Start from an official Python base image  
+FROM python:3.11-slim  
+ 
+# Step 2: Set the working directory inside the container  
+WORKDIR /app  
+ 
+# Step 3: Copy the requirements file first (for layer caching)  
+COPY requirements.txt .  
+ 
+# Step 4: Install Python dependencies  
+RUN pip install --no-cache-dir -r requirements.txt  
+ 
+# Step 5: Copy the rest of the application code  
+COPY . . 
+ 
+# Step 6: Tell Docker which port the app listens on (documentation only)  
+EXPOSE 5000  
+ 
+# Step 7: The command to run when the container starts  
+CMD ["python3", "app.py"]  
+
+--- week09devops.pdf page 5 ---
+Department of SWE & CYS                                                                       SE202L Development Operations Lab                              
+Page 90 of 112 
+  
+ 
+4.3 Dockerfile Instructions Reference Instruction  Purpose  Example  FROM  Base image to start from  FROM python:3.11-slim  WORKDIR  Set the working directory inside the container  WORKDIR /app  COPY  Copy files from host into the image COPY . .  RUN Execute a command during the image build  RUN pip install flask  EXPOSE  Document which port the app uses (does not open it) EXPOSE 5000  ENV Set an environment variable inside the container  ENV FLASK_ENV=production  CMD  Default command to run when container starts  CMD ["python3", "app.py"]  ENTRYPOINT  Like CMD but cannot be overridden by docker run args  ENTRYPOINT ["gunicorn"]   
+4.4 Creating requirements.txt and Building the Image 
+# Create requirements.txt listing all Python dependencies  
+$ cd ~/devops/week5  
+$ echo 'flask' > requirements.txt  
+$ echo 'flask-cors' >> requirements.txt  
+ 
+# Build the Docker image (-t gives it a name:tag)  
+$ docker build -t flask-api:v1 .  
+ 
+# Watch the build layers — each instruction is one layer  
+# Verify the image was created  
+$ docker images | grep flask-api  
+ 
+4.5 Running Your Flask Container 
+# Run the containerised Flask app  
+# -d = detached (background)  
+# -p 5000:5000 = map host port 5000 to container port 5000  
+# --name = give the container a friendly name  
+$ docker run -d -p 5000:5000 --name flask-api flask-api:v1  
+ 
+# Test it — the app is now running inside a container  
+$ curl http://localhost:5000/api/students  
+ 
+# Check the container logs  
+$ docker logs -f flask-api  
+ 
+
+--- week09devops.pdf page 6 ---
+Department of SWE & CYS                                                                       SE202L Development Operations Lab                              
+Page 91 of 112 
+  
+ 
+Docker Compose                                                                                . 
+5.1 What is Docker Compose and Why Use It?  
+Real applications rarely consist of a single container. A typical setup might include a backend API 
+container, a database container, and a frontend container  all needing to communicate with each 
+other. Starting, configuring, and linking multiple containers with separate docker run commands is 
+complex and error-prone.  
+ 
+Docker Compose solves this by letting you define your entire multi-container application in a single 
+file called docker-compose.yml. With one command docker compose up  all containers start together, 
+correctly configured and networked. This makes local development and testing dramatically simpler.  
+ 
+5.2 The docker-compose.yml File  
+Create a new project directory for a multi-container application:  
+$ mkdir -p ~/devops/week9/fullstack && cd ~/devops/week9/fullstack  
+ 
+Create the docker-compose.yml file:  
+# docker-compose.yml  
+version: '3.8'  
+ 
+services:  
+ 
+  # Service 1: Flask backend API  
+  api: 
+    build: ./api              # Build image from ./api/Dockerfile  
+    container_name: flask-api  
+    ports:  
+      - '5000:5000'           # host:container port mapping  
+    environment:  
+      - FLASK_ENV=development  
+    volumes:  
+      - ./api:/app            # Mount code for live reload during dev  
+    networks:  
+- app-network
+ 
+  # Service 2: Simple web server for the frontend  
+  frontend:  
+    image: nginx:alpine       # Use official nginx image directly  
+    container_name: frontend  
+    ports:  
+      - '8080:80'             # Serve frontend on host port 8080  
+    volumes:  
+      - ./frontend:/usr/share/nginx/html  # Mount our HTML files  
+
+--- week09devops.pdf page 7 ---
+Department of SWE & CYS                                                                       SE202L Development Operations Lab                              
+Page 92 of 112 
+     networks:  
+      - app-network  
+    depends_on:  
+      - api                   # Start api container before frontend  
+ 
+networks:  
+  app-network:               # Custom network so containers can talk  
+    driver: bridge  
+ 
+5.3 Docker Compose Commands  
+# Start all services (builds images if needed)  
+$ docker compose up  
+ 
+# Start in detached mode (background)  
+$ docker compose up -d  
+ 
+# View logs from all services  
+$ docker compose logs  
+ 
+# Follow logs for a specific service  
+$ docker compose logs -f api  
+ 
+# List running compose services  
+$ docker compose ps  
+ 
+# Stop all services (containers remain)  
+$ docker compose stop  
+ 
+# Stop AND remove containers, networks  
+$ docker compose down  
+ 
+# Rebuild images and restart  
+$ docker compose up --build -d  
+ 
+docker compose down removes containers and networks but keeps your images and volumes. 
+If you want a completely clean slate, use docker compose down --volumes --rmi all , but be 
+careful, this deletes all data stored in volumes too.  
+ 
+Practice Exercise                                                                                                  . 
+Part A: First Container  
+1. Verify Docker is installed and working  
+$ docker --version  
+$ docker run hello-world  
+ 
+2. Pull and run an nginx web server container  
+
+--- week09devops.pdf page 8 ---
+Department of SWE & CYS                                                                       SE202L Development Operations Lab                              
+Page 93 of 112 
+ $ docker pull nginx:alpine  
+$ docker run -d -p 8080:80 --name my-nginx nginx:alpine  
+ 
+3. Verify it is running and visit it in the browser  
+$ docker ps  
+$ curl http://localhost:8080  
+ 
+4. Explore inside the running container  
+$ docker exec -it my-nginx sh  
+# ls /usr/share/nginx/html  
+# exit 
+ 
+5. View its logs and then stop and remove it  
+$ docker logs my-nginx  
+$ docker stop my-nginx  
+$ docker rm my-nginx  
+ 
+Part B: Containerise the Flask App  
+6. Set up the project with Dockerfile and requirements.txt  
+$ mkdir -p ~/devops/week9/flask-api  
+$ cp ~/devops/week5/app.py ~/devops/week9/flask-api/  
+$ cd ~/devops/week9/flask-api  
+$ echo 'flask' > requirements.txt  
+$ echo 'flask-cors' >> requirements.txt  
+ 
+7. Create the Dockerfile (use the template from Section 4.2)  
+$ nano Dockerfile  
+ 
+8. Build the image and verify  
+$ docker build -t flask-api:v1 .  
+$ docker images | grep flask-api  
+ 
+9. Run the container and test with curl  
+$ docker run -d -p 5000:5000 --name flask-api flask-api:v1  
+$ curl http://localhost:5000/api/students  
+$ docker logs flask-api  
+ 
+Part C: Docker Compose: Two Services  
+10. Create the fullstack project structure  
+$ mkdir -p ~/devops/week9/fullstack/api  
+$ mkdir -p ~/devops/week9/fullstack/frontend  
+$ cp ~/devops/week9/flask-api/* ~/devops/week9/fullstack/api/  
+$ cd ~/devops/week9/fullstack  
+ 
+11. Create a simple frontend index.html  
+$ nano frontend/index.html  
+
+--- week09devops.pdf page 9 ---
+Department of SWE & CYS                                                                       SE202L Development Operations Lab                              
+Page 94 of 112 
+ # Add: <!DOCTYPE html><html><body>  
+#   <h1>Memoona Full Stack App</h1>  
+#   <p>Frontend served by nginx. API on port 5000.</p>  
+# </body></html>  
+ 
+12. Create the docker-compose.yml (use template from Section 5.2)  
+$ nano docker-compose.yml  
+ 
+13. Launch both services and verify  
+$ docker compose up -d  
+$ docker compose ps  
+$ curl http://localhost:5000/api/students   # Flask API  
+$ curl http://localhost:8080                # Frontend via nginx  
+ 
+14. View combined logs and then bring everything down  
+$ docker compose logs  
+$ docker compose down  
+ 
+ 
+Lab Evaluation Tasks                                                                                   . 
+Complete both tasks. Attach word file and screenshots where necessary . Each task carries equal 
+marks.  
+ 
+Lab Task 1: Multi-Container Application with Docker Compose  
+Deploy a two-service application using Docker Compose — a Flask API backend and an nginx 
+frontend. Both must be running and reachable when the instructor checks.  
+1. Set up the project at ~/devops/week9/fullstack/ with api/ and frontend/ subdirectories  
+2. The api/ directory must contain app.py, requirements.txt, and a Dockerfile  
+3. The frontend/ directory must contain an index.html that includes a JavaScript fetch() call to 
+http://localhost:5000/api/students and displays results in a list  
+4. Write a docker-compose.yml that defines both services, maps correct ports (5000 for api, 
+8080 for frontend), adds a shared network, and uses depends_on so the api starts first  
+5. Run docker compose up -d and verify both containers are running with docker compose ps  
+6. Demonstrate: curl http://localhost:5000/api/students returns JSON, curl http://localhost:8080 
+returns the HTML page  
+7. Run docker compose logs and show the instructor logs from both services in one output  
+8. Run docker compose down and confirm all containers are removed with docker ps -a  
+ 
+ 
+ 
+ 
+ 
+
+====================
+WEEK 10 — FULL MANUAL EXTRACT
+====================
+
+--- lab10.pdf page 1 ---
+Department of SWE & CYS                                                                        SE202L Development Operations Lab                                            
+Page 95 of 112 
+  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ WEEK 10  
+CI/CD with  GitHub Actions  
+
+
+--- lab10.pdf page 2 ---
+Department of SWE & CYS                                                                        SE202L Development Operations Lab                                            
+Page 96 of 112 
+  
+ 
+What is CI/CD?                                                                                    . 
+1.1 The Problem CI/CD Solves  
+Before CI/CD, software teams integrated and deployed code manually. Developers worked in 
+isolation for days or weeks, then merged everything together only to discover dozens of conflicts and 
+broken features. Deployments were manual, error -prone, and stressful events that sometimes took 
+entire weekends.  
+ 
+CI/CD automates the entire process from c ode push to deployment. The moment a user pushes a 
+commit to GitHub, an automated pipeline springs into action running tests, building the application, 
+and verifying everything works without any human intervention.  
+ 
+1.2 Continuous Integration (CI)  
+Continuo us Integration means integrating code changes frequently ideally every time a developer 
+pushes to the repository and automatically verifying that the change does not break anything. A CI 
+pipeline typically:  
+• Checks out the latest code from the repository  
+• Installs all dependencies  
+• Runs automated tests to verify correctness  
+• Builds the application (e.g. builds a Docker image)  
+• Reports success or failure back to the developer immediately  
+ 
+1.3 Continuous Delivery (CD)  
+Continuous Delivery extends CI by automaticall y preparing the application for deployment after 
+every successful build. The code is always in a deployable state. In a full CD pipeline, the application 
+might also be automatically deployed to a staging or production server. In this lab we focus on CI 
+and the build stage of CD.  
+ 
+1.4 Key Terms  
+Term  Meaning  
+Pipeline  The full automated sequence of steps that runs on every code push  
+Workflow  A GitHub Actions pipeline: defined in a YAML file inside your repository  
+Job A group of steps that run together on th e same machine (runner)  
+Step A single action inside a job, run a command, or use a pre -built action  
+Runner  The virtual machine that GitHub provides to execute your workflow  
+Trigger  The event that starts the workflow e.g. a push to main, or a pull reques t 
+Secret  An encrypted variable stored in GitHub for sensitive values like passwords 
+and API keys  
+
+--- lab10.pdf page 3 ---
+Department of SWE & CYS                                                                        SE202L Development Operations Lab                                            
+Page 97 of 112 
+ Artifact  A file produced by the pipeline (e.g. test reports, built binaries) that can be 
+downloaded  
+ 
+ 
+GitHub Actions Fundamentals                                                         . 
+2.1 How GitHub Actions Works  
+GitHub Actions is GitHub's built -in CI/CD platform. It is free for public repositories and has a 
+generous free tier for private ones. Workflows are defined as YAML files stored inside your 
+repos itory at a specific location: .github/workflows/. GitHub reads these files automatically and runs 
+them when the trigger event occurs.  
+ 
+Every workflow file follows the same structure: a name, one or more trigger events, and one or more 
+jobs. Each job contai ns a list of steps that run sequentially on a GitHub -hosted runner (a fresh 
+Ubuntu, Windows, or macOS virtual machine).  
+ 
+2.2 Anatomy of a Workflow File  
+# .github/workflows/ci.yml  
+ 
+name: CI Pipeline              # Display name shown in GitHub Actions tab  
+ 
+on:                            # Triggers — when does this run?  
+  push:  
+    branches: [ main ]         # Run on every push to the main branch  
+  pull_request:  
+    branches: [ main ]         # Also run when a PR targets main  
+ 
+jobs:                          # One or more jobs to execute  
+  build-and-test:              # Job ID (used for referencing between jobs)  
+    runs-on: ubuntu -latest     # The type of runner to use  
+ 
+    steps:                     # Sequential list of steps in this job  
+ 
+      - name: Checkou t code    # Step 1: get the repository code  
+        uses: actions/checkout@v4  
+ 
+      - name: Set up Python    # Step 2: install Python  
+        uses: actions/setup -python@v5  
+        with:  
+          python-version: '3.11'  
+ 
+      - name: Install dependencies   # Step 3: install packages  
+        run: pip install -r requirements.txt  
+ 
+      - name: Run tests        # Step 4: execute tests  
+        run: python -m pytest tests/ -v 
+ 
+2.3 Understanding the YAML Structure  
+
+--- lab10.pdf page 4 ---
+Department of SWE & CYS                                                                        SE202L Development Operations Lab                                            
+Page 98 of 112 
+ Key Purpose  Example Value  
+name  Human -readable n ame for the workflow  CI Pipeline  
+on Events that trigger the workflow  push, pull_request  
+jobs Collection of jobs to run  build -and-test 
+runs-on The operating system for the runner  ubuntu -latest  
+steps  List of tasks inside a job  - name: ...  
+uses Use a pre -built action from the GitHub 
+marketplace  actions/checkout@v4  
+run Execute a shell command directly  pip install flask  
+with Pass parameters to an action  python -version: '3.11'  
+env Set environment variables for a step or 
+job FLASK_ENV: testing  
+needs  Make a job wait for another job to finish 
+first needs: build -and-test 
+  
+Writing Automated Tests for Flask                                                    . 
+3.1 Why Tests are Essential in CI  
+A CI pipeline is only as useful as the tests it runs. Without tests , the pipeline just checks that the 
+code can be installed not that it actually works correctly. Automated tests are the safety net that 
+catches bugs before they reach users.  
+ 
+Python's pytest framework makes writing and running tests simple. Flask provides a built -in test 
+client that lets you make HTTP requests to your app in tests without actually starting a server.  
+ 
+3.2 Creating Tests for the Flask CRUD API  
+Create a file called test_app.py inside your Flask project:  
+# test_app.py  
+import pytest  
+from app imp ort app  
+ 
+@pytest.fixture  
+def client():  
+    app.config['TESTING'] = True  
+    with app.test_client() as client:  
+        yield client  
+ 
+# Test 1: Health check endpoint returns 200  
+def test_health_check(client):  
+    response = client.get('/api/health')  
+    assert response.status_code == 200  
+    data = response.get_json()  
+
+--- lab10.pdf page 5 ---
+Department of SWE & CYS                                                                        SE202L Development Operations Lab                                            
+Page 99 of 112 
+     assert data['status'] == 'ok'  
+ 
+# Test 2: Get all students returns a list  
+def test_get_students(client):  
+    response = client.get('/api/students')  
+    assert response.status_code == 200  
+    data = response.get_json()  
+    assert isinstance(data, list)  
+ 
+# Test 3: Get a student that does not exist returns 404  
+def test_get_student_not_found(client):  
+    response = client.get('/api/students/9999')  
+    assert response.status_code == 404  
+ 
+# Test 4: POST a new student with valid data returns 201  
+def test_add_student(client):  
+    new_student = {'name': 'Memoona', 'grade': 'A'}  
+    response = client.post('/api/students',  
+                           json=new_student)  
+    assert response.status_code == 201  
+    data = response.get_json()  
+    assert data['name'] == 'Memoona'  
+ 
+# Test 5: POST without required fields returns 400  
+def test_add_student_missing_field(client):  
+    response = client.post('/api/students',  
+                           json={'name': 'Sara' }) 
+    assert response.status_code == 400  
+ 
+3.3 Running Tests Locally First  
+# Install pytest  
+$ pip3 install pytest  
+ 
+# Run all tests — always verify locally before pushing  
+$ python -m pytest test_app.py -v 
+ 
+# Expected output:  
+# test_app.py::test_health_check           PASSED  
+# test_app.py::test_get_students           PASSED  
+# test_app.py::test_get_student_not_found  PASSED  
+# test_app.py::test_add_student            PASSED  
+# test_app.py::test_add_student_missing_field PASSED  
+# 5 passed in 0.42s  
+ 
+Always run test s locally before pushing. If tests fail locally, fix them before they fail in the 
+pipeline. A failing pipeline is visible to everyone on the team — it is much better to catch issues 
+on your own machine first.  
+
+--- lab10.pdf page 6 ---
+Department of SWE & CYS                                                                        SE202L Development Operations Lab                                            
+Page 100 of 112 
+  
+Building the CI Pipeline                                                                   . 
+4.1 Repository Setup  
+Your Flask project on GitHub (from Week 7) needs the following files before building the pipeline. 
+Make sure all are committed and pushed:  
+• app.py:  the Flask CRUD API with /api/health end point 
+• test_app.py:  the test file from Section 3  
+• requirements.txt:  must include flask, flask -cors, and pytest  
+• Dockerfile:  from Week 9  
+• .dockerignore:  excluding __pycache__, .env, *.pyc, *.log  
+ 
+4.2 Pipeline Stage 1:  Lint and Test  
+Create the workflow directory  and first pipeline file:  
+$ mkdir -p .github/workflows  
+$ nano .github/workflows/ci.yml  
+ 
+name: Flask CI Pipeline  
+ 
+on: 
+  push:  
+    branches: [ main ]  
+  pull_request:  
+    branches: [ main ]  
+ 
+jobs:  
+  test:  
+    name: Run Tests  
+    runs-on: ubuntu -latest  
+ 
+    steps:  
+      - name: Checkout repository  
+        uses: actions/checkout@v4  
+ 
+      - name: Set up Python 3.11  
+        uses: actions/setup -python@v5  
+        with:  
+          python-version: '3.11'  
+ 
+      - name: Install dependencies  
+        run: |  
+          pip install --upgrade pip  
+          pip install -r requirements.txt  
+          pip install pytest  
+ 
+
+--- lab10.pdf page 7 ---
+Department of SWE & CYS                                                                        SE202L Development Operations Lab                                            
+Page 101 of 112 
+       - name: Run pytest  
+        run: python -m pytest test_app.py -v 
+ 
+      - name: Verify health endpoint exists  
+        run: python -c "from app import app; a ssert '/api/health' in [r.rule 
+for r in app.url_map.iter_rules()]"  
+ 
+4.3 Pipeline Stage 2:  Build Docker Image  
+Add a second job to the same workflow file that builds the Docker image after tests pass. The needs: 
+test line ensures this job only runs if the te st job succeeded.  
+  build-docker:  
+    name: Build Docker Image  
+    runs-on: ubuntu -latest  
+    needs: test              # Only run if the test job passed  
+ 
+    steps:  
+      - name: Checkout repository  
+        uses: actions/checkout@v4  
+ 
+      - name: Build Do cker image  
+        run: docker build -t flask-api:${{ github.sha }} .  
+ 
+      - name: Verify container starts correctly  
+        run: |  
+          docker run -d -p 5000:5000 --name test -container \ 
+            flask-api:${{ github.sha }}  
+          sleep 3  
+          curl --fail http://localhost:5000/api/health  
+          docker stop test -container  
+          docker rm test -container  
+ 
+github.sha is a built -in GitHub Actions variable containing the unique commit hash. Using it as 
+the image tag means every build is traceable back to the exact commit that produced it — a 
+best practice for production deployments.  
+ 
+4.4 Pushing and Watching the Pipeline Run  
+# Stage all new files  
+$ git add .github/ test_app.py requirements.txt  
+ 
+# Commit with a clear message  
+$ git commit -m "Add CI pipeline with pytest and Docker build"  
+ 
+# Push to GitHub — this triggers the workflow immediately  
+$ git push origin main  
+ 
+
+--- lab10.pdf page 8 ---
+Department of SWE & CYS                                                                        SE202L Development Operations Lab                                            
+Page 102 of 112 
+ After pushing, navigate to your GitHub repository in the browser and click the Actions tab. You will 
+see your workflow runn ing in real time. Click on it to watch each step execute, view its output, and 
+see the green checkmark when it passes or a red X with the error message if it fails.  
+ 
+4.5 Using Secrets for Sensitive Values  
+Never put passwords, API keys, or tokens directly i n your workflow YAML file, it is public and anyone 
+can read it. GitHub Secrets store encrypted values that are injected into the pipeline at runtime.  
+ 
+1. Go to your GitHub repository → Settings → Secrets and variables → Actions  
+2. Click New repository secret  
+3. Nam e it (e.g. DOCKER_PASSWORD) and paste the value  
+4. Reference it in your workflow as: ${{ secrets.DOCKER_PASSWORD }}  
+ 
+# Example: using a secret in a workflow step  
+      - name: Log in to Docker Hub  
+        run: echo ${{ secrets.DOCKER_PASSWORD }} | docker logi n -u ${{ 
+secrets.DOCKER_USERNAME }} --password -stdin  
+ 
+Never echo or print a secret value in your workflow, even by accident. GitHub automatically masks 
+known secret values in logs, but any transformation of the secret (e.g. base64 encoding) will not be 
+masked. 
+ 
+Practice Exercise                                                                                 . 
+Part A: Prepare the Repository  
+1. Open the GitHub repository you created in Week 7 for your Flask API  
+2. Clone it locally if needed and navigate into it  
+$ git clone https://github.com/your -username/flask -api.git  
+$ cd flask -api 
+ 
+3. Ensure requirements.txt includes all needed packages  
+$ cat requirements.txt  
+# Should contain: flask, flask -cors, pytest  
+ 
+4. Ensure app.py has the /api/health endpoint. If not, add it:  
+# Add inside app.py  
+@app.route('/api/health', methods=['GET'])  
+def health():  
+    return jsonify({'status': 'ok', 'message': 'Flask is running'}), 200  
+ 
+Part B: Write and Run Tests Locally  
+5. Create test_app.py with all 5 tests from Section 3.2  
+$ nano test_app.py  
+ 
+6. Install pytest and run tests locally — all 5 must pass before continuing  
+$ pip3 install pytest  
+$ python -m pytest test_app.py -v 
+
+--- lab10.pdf page 9 ---
+Department of SWE & CYS                                                                        SE202L Development Operations Lab                                            
+Page 103 of 112 
+  
+Part C: Set Up the GitHub Actions Workflow  
+7. Create the workflows directory and CI file  
+$ mkdir -p .github/workflows  
+$ nano .g ithub/workflows/ci.yml  
+ 
+8. Write the full two -job pipeline from Sections 4.2 and 4.3  
+ 
+9. Commit and push everything to trigger the pipeline  
+$ git add .  
+$ git commit -m "Add CI pipeline with tests and Docker build"  
+$ git push origin main  
+ 
+10. Open GitHub in the brows er → Actions tab → watch both jobs run  
+ 
+11. Deliberately break a test to see the pipeline fail, then fix it  
+# Edit test_app.py — change a correct assertion to a wrong one  
+# e.g. change assert response.status_code == 200 to assert 
+response.status_code == 999  
+$ git add test_app.py  
+$ git commit -m "Intentional failing test"  
+$ git push origin main  
+# Watch the pipeline fail in the Actions tab  
+# Then revert the change, push again, and watch it go green  
+ 
+Lab Evaluation Tasks                                                                     . 
+Both tasks are demonstrated live on GitHub. Open your repository's Actions tab to verify pipeline 
+runs, view logs, and check pass/fail status. Document your task as well, Each task carries equal 
+marks.  
+ 
+Lab Task 1: Full CI Pipeli ne (Tests and Docker Build)  
+Build a complete two -job GitHub Actions pipeline for your Flask CRUD API. The pipeline must run 
+automatically on every push to main and both jobs must show green (passing) in the Actions tab.  
+1. Ensure your GitHub repository con tains: app.py (with /api/health), requirements.txt (flask, 
+flask-cors, pytest), Dockerfile, and .dockerignore  
+2. Write test_app.py with at least 5 tests covering: health check (200), get all students (200 + 
+list), get non -existent student (404), add valid student (201 + name check), add student 
+missing a field (400)  
+3. Create .github/workflows/ci.yml with two jobs: 'test' (checkout, setup Python 3.11, install 
+deps, run pytest) and 'build -docker' (needs: test, checkout, docker build, run container, curl 
+health, stop container)  
+4. Push to GitHub and confirm both jobs complete successfully — show the instructor the 
+green checkmarks in the Actions tab  
+5. Click on a completed run and show the instructor the step -by-step log output for the pytest 
+step — all 5 test s must be visible as PASSED  
+6. Show the Docker build step log — the instructor will verify the image was built with the 
+commit SHA as the tag  
+
+--- lab10.pdf page 10 ---
+Department of SWE & CYS                                                                        SE202L Development Operations Lab                                            
+Page 104 of 112 
+  
+Lab Task 2: (Pipeline Resilience and Secrets)  
+Demonstrate that the CI pipeline correctly catches failures and that you understand how to use 
+GitHub Secrets safely.  
+1. Deliberately introduce a bug in app.py change the /api/health route to return status code 
+500 instead of 200  
+2. Push the broken code to main and watch the pipeline run the test job must fail at the p ytest 
+step 
+3. Take a screenshot or note the exact error message GitHub shows in the failed step log  
+4. Fix the bug, push again, and verify the pipeline goes green  
+5. Add a third job to your workflow called 'report' that runs after build -docker and prints a  
+summary: echo 'Pipeline complete for commit: ${{ github.sha }}' show the instructor this step in 
+the Actions log  
+6. In your GitHub repository settings, create a dummy secret named LAB_SECRET with value 
+yourname -devops -week10  
+7. Add a step to your workflow that uses this secret: echo 'Secret loaded successfully' (do 
+NOT print the secret value itself)  demonstrate the step runs without exposing the value in the 
+logs 
+8. Write a short explanation (in a file called ci_notes.txt committed to the repo): what would  
+happen to the build -docker job if the test job fails? Why is this important?  
+  
+
+====================
+WEEK 11 — FULL MANUAL EXTRACT
+====================
+
+--- week 11 devops.pdf page 1 ---
+Department of SWE & CYS                                                                       SE202L Development Operations Lab                              
+Page 105 of 112 
+  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+WEEK 11  
+Cloud Computing & AWS EC2:  Manual Application Deployment  
+
+
+--- week 11 devops.pdf page 2 ---
+Department of SWE & CYS                                                                       SE202L Development Operations Lab                              
+Page 106 of 112 
+ Cloud Computing Fundamentals                                                       . 
+1.1 What is Cloud Computing? 
+Before the cloud, companies that wanted to run a server had to buy physical hardware, find a place 
+to put it, connect it to the internet, cool it, power it, and maintain it. This was expensive, slow, and 
+required specialist staff. If demand suddenly doubled, there was no quick way to add capacity.  
+ 
+Cloud computing means renting computing resources  servers, storage, networking, databases from 
+a provider over the internet, on demand, and paying only for what you use. Instead of buying a 
+server, you click a button and have a virtual server running in minutes. When you no longer need it, 
+you delete it and stop paying.  
+ 
+1.2 Cloud Service Models Model  Full Name  What You Get  Example IaaS Infrastructure as a Service  Raw virtual machines, storage, networking  you manage the OS and everything above  AWS EC2, Google Compute Engine PaaS  Platform as a Service  A managed platform you deploy code, the provider manages the OS and runtime  AWS Elastic Beanstalk, Heroku  SaaS  Software as a Service  A fully managed application you just use it  Gmail, GitHub, Slack   
+In this lab you will use IaaS specifically AWS EC2 where you get a raw virtual machine and are 
+responsible for everything that runs on it. This is the most fundamental cloud model and the one 
+DevOps engineers work with most directly.  
+ 
+1.3 What is AWS and EC2? 
+AWS (Amazon Web Services) is the world's largest cloud provider, used by companies from startups 
+to governments. EC2 (Elastic Compute Cloud) is AWS's virtual machine service. Each virtual 
+machine is called an instance. You choose the operating system (Ubuntu, Amazon Linux, Windows), 
+the hardware specs (CPU, RAM), and the region (which data centre in the world to use).  
+ 
+1.4 Key AWS and EC2 Terms Term  Meaning Instance  A single virtual machine running in AWS  AMI Amazon Machine Image , the OS template used to launch an instance (e.g. Ubuntu 22.04) Instance TypeThe hardware specs of the instance , e.g. t2.micro (1 vCPU, 1GB RAM, free tier) Security Group A virtual firewall that controls which ports are open to the internet  Key Pair  An SSH key pair , the private key (.pem file) lets you log in to your instance securely 
+
+--- week 11 devops.pdf page 3 ---
+Department of SWE & CYS                                                                       SE202L Development Operations Lab                              
+Page 107 of 112 
+ Public IP  The internet-facing IP address assigned to your instance , how the world reaches it  Elastic IP  A static public IP that stays the same even if you stop/start the instance  Free Tier  AWS allows t2.micro instances to run for 750 hours/month free for 12 months after sign-up Region  The geographical location of the data centre , choose the closest one for lowest latency  
+Launching an EC2 Instance                                                                . 
+2.1 Creating an AWS Account 
+Go to https://aws.amazon.com and click Create an AWS Account. You will need a valid email 
+address, a phone number for verification, and a credit/debit card (required by AWS even for free-tier 
+usage , you will not be charged if you stay within free tier limits).  
+ 
+Always stay within the Free Tier limits to avoid charges. Use t2.micro instance type, stop your instance 
+when the lab is finished, and set up a billing alert at $1 in the AWS Billing console so you get an email if 
+any cost is incurred.  
+ 
+2.2 Step-by-Step: Launch a t2.micro Ubuntu Instance 
+1. Sign in to the AWS Console at https://console.aws.amazon.com  
+2. In the search bar at the top, type EC2 and click the EC2 service  
+3. Click the orange Launch Instance button  
+4. Name your instance: yourname-devops-server  
+5. Under Application and OS Images: select Ubuntu Server 22.04 LTS (Free tier eligible)  
+6. Under Instance Type: select t2.micro (Free tier eligible)  
+7. Under Key pair: click Create new key pair, name it devops-key, select RSA and .pem format, 
+click Create the .pem file downloads automatically. Keep this file safe , you cannot download it 
+again  
+8. Under Network settings: click Edit. Make sure Allow SSH traffic is checked (port 22). Also add 
+a Custom TCP rule for port 5000 with source 0.0.0.0/0 (this allows internet access to your 
+Flask app)  
+9. Under Configure storage: keep the default 8GB  
+10. Click Launch Instance and wait about 60 seconds for it to start  
+11. Click on the instance ID to open its details. Note the Public IPv4 address , you will need it to 
+connect 
+ 
+Connecting to the Server via SSH  
+3.1 Setting Up the Key File 
+The .pem key file you downloaded must have strict permissions before SSH will accept it. This is a 
+Linux security requirement if the key file is readable by others, SSH refuses to use it.  
+# Move the key to a safe location  
+$ mv ~/Downloads/devops-key.pem ~/.ssh/devops-key.pem  
+ 
+# Set correct permissions — owner read only  
+
+--- week 11 devops.pdf page 4 ---
+Department of SWE & CYS                                                                       SE202L Development Operations Lab                              
+Page 108 of 112 
+ $ chmod 400 ~/.ssh/devops-key.pem  
+ 
+# Verify permissions  
+$ ls -la ~/.ssh/devops-key.pem  
+# Should show: -r-------- (400)  
+ 
+3.2 Connecting with SSH 
+Replace YOUR_PUBLIC_IP with the Public IPv4 address from the EC2 dashboard. The default 
+username for Ubuntu AMIs is ubuntu.  
+# Connect to your EC2 instance  
+$ ssh -i ~/.ssh/devops-key.pem ubuntu@YOUR_PUBLIC_IP  
+ 
+# Example:  
+$ ssh -i ~/.ssh/devops-key.pem ubuntu@54.123.45.67  
+ 
+# First connection: type 'yes' to accept the host fingerprint  
+# You will see a prompt like:  
+# ubuntu@ip-172-31-xx-xx:~$  
+ 
+You are now inside your cloud server. Everything you type runs on a machine in an AWS data 
+centre, not on your laptop. All the Linux skills from Weeks 1–8 apply here exactly as they did locally.  
+ 
+To avoid typing the full SSH command every time, add an alias to your ~/.bashrc: alias aws-server='ssh 
+-i ~/.ssh/devops-key.pem ubuntu@YOUR_PUBLIC_IP'. Then you just type aws-server to connect.  
+ 
+Setting Up the Server                                                                          . 
+4.1 Update the Server 
+Always update the package list and upgrade installed packages on a fresh server before installing 
+anything. This ensures you have the latest security patches.  
+# Run these on the EC2 instance (after SSH connection)  
+$ sudo apt update && sudo apt upgrade -y  
+ 
+# Verify the OS  
+$ lsb_release -a  
+ 
+# Check available disk and memory  
+$ df -h 
+$ free -h  
+ 
+4.2 Install Docker on the EC2 Instance 
+The EC2 instance is a fresh Ubuntu server, Docker is not installed. Run the same installation steps 
+from Week 9:  
+$ sudo apt install -y ca-certificates curl gnupg  
+$ sudo install -m 0755 -d /etc/apt/keyrings  
+$ curl -fsSL https://download.docker.com/linux/ubuntu/gpg | \  
+  sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg  
+$ echo "deb [arch=$(dpkg --print-architecture) \  
+  signed-by=/etc/apt/keyrings/docker.gpg] \  
+
+--- week 11 devops.pdf page 5 ---
+Department of SWE & CYS                                                                       SE202L Development Operations Lab                              
+Page 109 of 112 
+   https://download.docker.com/linux/ubuntu \  
+  $(. /etc/os-release && echo $VERSION_CODENAME) stable" | \  
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null  
+$ sudo apt update && sudo apt install -y docker-ce docker-ce-cli containerd.io 
+docker-compose-plugin  
+$ sudo usermod -aG docker ubuntu  
+$ newgrp docker  
+$ docker --version  
+ 
+4.3 Transfer Project Files to the Server 
+You have two ways to get your Flask project onto the EC2 server:  
+ 
+Method 1: Clone from GitHub (Recommended)  
+# On the EC2 instance  
+$ sudo apt install -y git  
+$ git clone https://github.com/your-username/flask-api.git  
+$ cd flask-api  
+$ ls   # Verify app.py, Dockerfile, requirements.txt are present  
+ 
+Method 2: Copy files using scp (from your local machine)  
+# Run this on your LOCAL machine, not on EC2  
+$ scp -i ~/.ssh/devops-key.pem -r ~/devops/week5/ 
+ubuntu@YOUR_PUBLIC_IP:~/flask-api/  
+ 
+# scp = secure copy (uses SSH to transfer files)  
+# -r = recursive (copy entire directory)  
+# Source path  :  Destination path on EC2  
+ 
+Deploying the Flask Application                                                       . 
+5.1 Build and Run the Docker Container on EC2 
+On the EC2 instance, navigate to your project directory and build the Docker image exactly as you 
+did locally in Week 9. The only difference is this time it runs on a cloud server.  
+# On the EC2 instance  
+$ cd ~/flask-api  
+ 
+# Build the Docker image  
+$ docker build -t flask-api:v1 .  
+ 
+# Run the container  
+# -d = detached (background)  
+# -p 5000:5000 = map port 5000 on the server to port 5000 in the container  
+# --restart=always = restart automatically if the server reboots  
+$ docker run -d -p 5000:5000 --restart=always --name flask-api flask-api:v1  
+ 
+# Verify the container is running  
+$ docker ps  
+ 
+# Check logs  
+
+--- week 11 devops.pdf page 6 ---
+Department of SWE & CYS                                                                       SE202L Development Operations Lab                              
+Page 110 of 112 
+ $ docker logs flask-api  
+ 
+5.2 Testing the Deployment 
+Your application is now running on the internet. Test it from your local machine not from the EC2 
+instance to confirm it is publicly accessible.  
+# Run these on YOUR LOCAL MACHINE  
+# Replace YOUR_PUBLIC_IP with the EC2 public IP address  
+ 
+# Test the health endpoint  
+$ curl http://YOUR_PUBLIC_IP:5000/api/health  
+ 
+# Test get all students  
+$ curl http://YOUR_PUBLIC_IP:5000/api/students  
+ 
+# Add a new student from your local machine  
+$ curl -X POST http://YOUR_PUBLIC_IP:5000/api/students \  
+     -H 'Content-Type: application/json' \  
+     -d '{"name": "Memoona", "grade": "A"}'  
+ 
+# Also open in your browser:  
+# http://YOUR_PUBLIC_IP:5000/api/students  
+ 
+If these requests succeed, your application is live on the internet. Anyone with the public IP address 
+can reach it. Congratulations, you have completed a full deployment.  
+ 
+5.3 Monitoring the Running Application 
+# On the EC2 instance, watch live container logs  
+$ docker logs -f flask-api  
+ 
+# Check how much CPU and memory the container uses  
+$ docker stats flask-api  
+ 
+# Check server resource usage  
+$ free -h  
+$ df -h 
+$ uptime 
+ 
+# Check which ports are open  
+$ ss -tulnp | grep :5000  
+ 
+5.4 Security Group (Controlling Access) 
+The AWS Security Group acts as a firewall for your EC2 instance. In the EC2 dashboard you can 
+add or remove rules to control which ports are accessible and from which IP addresses. For this lab, 
+port 22 (SSH) and port 5000 (Flask) should be open.  
+ 
+ 
+ 
+
+--- week 11 devops.pdf page 7 ---
+Department of SWE & CYS                                                                       SE202L Development Operations Lab                              
+Page 111 of 112 
+ Port Protocol  Source  Purpose 22 TCP Your IP  SSH access connect to the server terminal  5000  TCP 0.0.0.0/0  Flask API accessible from the internet  80 TCP 0.0.0.0/0  HTTP if you later add an nginx reverse proxy 443 TCP 0.0.0.0/0  HTTPS for secure production traffic  
+ 
+In production, restrict port 22 (SSH) to your own IP address only  not 0.0.0.0/0. This prevents brute-
+force SSH attacks from the internet. You can set Your IP in the Source dropdown in the Security Group 
+rules.  
+ 
+The Full DevOps Journey                                                                . 
+Every tool and concept in this course has led to this final deployment:  
+ Week  What You Learned  Where It Is Used Today 1 Linux & terminal  SSH into EC2, all server commands  2 Permissions & processes  chmod on .pem key, docker ps, kill 3 Bash scripting Automation scripts, deployment helpers 4 HTML, CSS, JS, HTTP  Understanding what the server serves  5 Flask & REST API  The application running in the container  6 Git local  Version history of the project 7 GitHub & collaboration  git clone to pull code onto the EC2 server  8 Networking & app runtime Ports, ss -tulnp, nohup, logs 9 Docker & Compose Dockerfile, docker build, docker run  10 CI/CD GitHub Actions  Automated testing and image builds  11 AWS EC2 & deployment  The live running application in the cloud  
+ 
+Lab Evaluation Tasks                                                                         
+Both tasks are demonstrated live. Verify your EC2 instance, running container, and public 
+accessibility using curl from their own machine. Each task carries equal marks.  
+ 
+Lab Task 1: Live Cloud Deployment  
+Deploy your Flask CRUD API as a Docker container on an AWS EC2 instance. The application 
+must be publicly accessible via the EC2 public IP address when the instructor tests it. 
+1. Launch a t2.micro Ubuntu 22.04 EC2 instance named user-devops-server with a key pair 
+called devops-key 
+2. Configure the Security Group to allow inbound TCP on port 22 (SSH) and port 5000 (Flask 
+API) 
+3. SSH into the instance from your local terminal: ssh -i ~/.ssh/devops-key.pem 
+ubuntu@YOUR_PUBLIC_IP 
+4. Update the server: sudo apt update && sudo apt upgrade -y 
+
+--- week 11 devops.pdf page 8 ---
+Department of SWE & CYS                                                                       SE202L Development Operations Lab                              
+Page 112 of 112 
+ 5. Install Docker on the EC2 instance (full installation from Section 4.2) 
+6. Clone your Flask API repository from GitHub onto the EC2 server 
+7. Build the Docker image: docker build -t flask-api:v1 . 
+8. Run the container with --restart=always: docker run -d -p 5000:5000 --restart=always --
+name flask-api flask-api:v1 
+9. From YOUR LOCAL MACHINE, demonstrate: curl http://YOUR_PUBLIC_IP:5000/api/health 
+returns {status: ok} 
+10. From YOUR LOCAL MACHINE, POST a new student and GET all students, show both 
+responses to the instructor 
+ 
+Lab Task 2: Server Investigation and Deployment Report  
+Perform a thorough investigation of your running EC2 server and write a deployment report. The 
+report must be committed to your GitHub repository as deployment_report.md. 
+1. From the EC2 instance, run and record the output of: docker ps, docker logs flask-api, ss -
+tulnp | grep :5000, df -h, free -h, uptime 
+2. From your LOCAL machine, run: curl -i http://YOUR_PUBLIC_IP:5000/api/students and 
+record the full HTTP response including headers and status code 
+3. Stop and restart your container: docker stop flask-api then docker start flask-api,  verify it 
+recovers and is reachable again 
+4. Test the --restart=always flag: reboot the EC2 instance (sudo reboot), wait 60 seconds, 
+SSH back in, and verify the container started automatically without any manual intervention 
+5. Write deployment_report.md with: the EC2 instance public IP, instance type, region, Docker 
+version, all curl test results, and a paragraph in your own words describing what happens 
+step-by-step when someone accesses your API from the internet 
+6. Commit and push deployment_report.md to your GitHub repository 
+7. Show the instructor the GitHub repository with the report and the live API accessible from 
+the internet simultaneously 
+ 
+ 
+ 
+ 
+ 
+   
+
+====================
+ONE-PAGE EC2 + DOCKER QUICK FLOW
+====================
+sudo apt update && sudo apt upgrade -y
+sudo apt install -y git python3 python3-pip docker.io
+sudo systemctl start docker
+sudo systemctl enable docker
+sudo usermod -aG docker ubuntu
+newgrp docker
+
+git clone https://github.com/YOUR_GITHUB_USERNAME/YOUR_REPO.git
+cd YOUR_REPO
+
+docker build -t flask-api:v1 .
+docker run -d -p 5000:5000 --restart=always --name flask-api flask-api:v1
+
+docker ps
+docker logs flask-api
+ss -tulnp | grep :5000
+
+curl -i http://YOUR_PUBLIC_IP:5000/api/health
+curl -i http://YOUR_PUBLIC_IP:5000/api/students
+curl -i -X POST http://YOUR_PUBLIC_IP:5000/api/students -H 'Content-Type: application/json' -d '{"name":"Zara","grade":"A"}'
+
+TROUBLESHOOTING:
+docker stop flask-api && docker rm flask-api
+sudo usermod -aG docker $USER && newgrp docker
+Check EC2 security group: SSH 22 and Custom TCP 5000 from 0.0.0.0/0.
+Stop AWS charges after exam: EC2 -> Instance state -> Stop.
